@@ -8,18 +8,21 @@ import (
 )
 
 type server struct {
+	app *fiber.App
 }
 
 func New() http.HttpServer {
-	return &server{}
+	return &server{
+		app: fiber.New(),
+	}
 }
 
 func (s *server) Serve(ctx context.Context, address string) error {
-	app := fiber.New()
+	s.setupRouter()
 
 	startErr := make(chan error)
 	go func() {
-		startErr <- app.Listen(address)
+		startErr <- s.app.Listen(address)
 	}()
 
 	select {
@@ -31,6 +34,6 @@ func (s *server) Serve(ctx context.Context, address string) error {
 		}
 	}
 
-	log.Println("Server shutting down ...")
-	return app.Shutdown()
+	log.Println("Server is shutting down ...")
+	return s.app.Shutdown()
 }
