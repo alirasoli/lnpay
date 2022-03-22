@@ -1,6 +1,7 @@
 server:
   http:
     port: 3000
-lnbits:
-  url: https://lnurl.com
-  invoice_key: 23klsdlkjf234
+payment:
+  lnbits:
+    url: https://lnurl.com
+    invoice_key: 23klsdlkjf234
