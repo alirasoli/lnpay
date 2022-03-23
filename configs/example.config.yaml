@@ -5,3 +5,6 @@ payment:
   lnbits:
     url: https://lnurl.com
     invoice_key: 23klsdlkjf234
+database:
+  sqlite:
+    path: /usr/share/lnpay/lnpay.db
