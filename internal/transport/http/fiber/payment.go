@@ -5,8 +5,8 @@ import "github.com/gofiber/fiber/v2"
 // TODO add validation for required fields
 type PaymentRequest struct {
 	Amount      int64  `json:"amount"`
-	Currency    string `json:"currency"`
 	Description string `json:"description"`
+	Webhook     string `json:"webhook"`
 }
 
 type PaymentResponse struct {
@@ -21,7 +21,7 @@ func (h *handler) pay(ctx *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-	hash, invoice, err := h.paymentService.InitPayment(ctx.Context(), req.Amount, "USD", req.Description)
+	hash, invoice, err := h.paymentService.InitPayment(ctx.Context(), req.Amount, req.Description, req.Webhook)
 	if err != nil {
 		return err
 	}

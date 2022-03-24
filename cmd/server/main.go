@@ -25,9 +25,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	paymentService := payment.New(&cfg.Payment)
+	paymentService := payment.New(&cfg.Payment, sqliteDB)
 
-	f := fiber.New(paymentService, sqliteDB)
+	go func() {
+		err := paymentService.StartWorker(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	f := fiber.New(paymentService)
 	if err := f.Serve(ctx, ":"+cfg.Server.Http.Port); err != nil {
 		cancel()
 		log.Fatal(err)

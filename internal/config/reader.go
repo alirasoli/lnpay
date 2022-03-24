@@ -5,6 +5,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+// TODO set default values
+
 func LoadConfig(path string) (config *Config, err error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")

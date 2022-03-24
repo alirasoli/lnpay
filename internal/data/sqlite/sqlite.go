@@ -33,7 +33,7 @@ func New(cfg config.SQLite) (data.Database, error) {
 		return nil, errors.Wrap(err, "failed to create migrations")
 	}
 
-	if err := m.Up(); err != nil {
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		return nil, errors.Wrap(err, "failed to migrate database")
 	}
 

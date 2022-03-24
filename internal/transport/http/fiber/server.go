@@ -3,7 +3,6 @@ package fiber
 import (
 	"context"
 	"github.com/gofiber/fiber/v2"
-	"lnpay/internal/data"
 	"lnpay/internal/service"
 	"lnpay/internal/transport/http"
 	"log"
@@ -11,7 +10,6 @@ import (
 
 type server struct {
 	app     *fiber.App
-	db      data.Database
 	handler *handler
 }
 
@@ -19,10 +17,9 @@ type handler struct {
 	paymentService service.Payment
 }
 
-func New(paymentService service.Payment, db data.Database) http.HttpServer {
+func New(paymentService service.Payment) http.HttpServer {
 	return &server{
 		app: fiber.New(),
-		db:  db,
 		handler: &handler{
 			paymentService: paymentService,
 		},
