@@ -52,6 +52,7 @@ func (s *payment) callWebhook(ctx context.Context, webhook string, hash string) 
 	q := u.Query()
 	q.Set("hash", hash)
 	u.RawQuery = q.Encode()
+	// TODO use context
 	_, err := http.Get(u.String())
 	if err != nil {
 		return errors.Wrap(err, "failed to call webhook")

@@ -8,6 +8,7 @@ import (
 	"lnpay/internal/transport/http/fiber"
 	"log"
 	"os/signal"
+	"sync"
 	"syscall"
 )
 
@@ -27,7 +28,11 @@ func main() {
 
 	paymentService := payment.New(&cfg.Payment, sqliteDB)
 
+	var wg sync.WaitGroup
+
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		err := paymentService.StartWorker(ctx)
 		if err != nil {
 			log.Fatal(err)
@@ -39,4 +44,6 @@ func main() {
 		cancel()
 		log.Fatal(err)
 	}
+
+	wg.Wait()
 }
