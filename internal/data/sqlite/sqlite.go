@@ -1,8 +1,10 @@
 package sqlite
 
 import (
-	"context"
 	"database/sql"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"lnpay/internal/config"
@@ -19,15 +21,21 @@ func New(cfg config.SQLite) (data.Database, error) {
 		return nil, errors.Wrap(err, "failed to open sqlite database")
 	}
 
-	return &sqlite{db: db}, nil
-}
-
-func (s *sqlite) GetVersion(ctx context.Context) (int, error) {
-	var version int
-	err := s.db.QueryRowContext(ctx, "SELECT version FROM version").Scan(&version)
+	driver, err := sqlite3.WithInstance(db, &sqlite3.Config{})
 	if err != nil {
-		return 0, errors.Wrap(err, "failed to get version")
+		return nil, errors.Wrap(err, "failed to create sqlite driver")
 	}
 
-	return version, nil
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://internal/data/sqlite/migrations",
+		"sqlite3", driver)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create migrations")
+	}
+
+	if err := m.Up(); err != nil {
+		return nil, errors.Wrap(err, "failed to migrate database")
+	}
+
+	return &sqlite{db: db}, nil
 }

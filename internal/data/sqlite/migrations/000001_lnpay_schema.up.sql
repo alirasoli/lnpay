@@ -1,0 +1,7 @@
+CREATE TABLE payments (
+    hash TEXT NOT NULL PRIMARY KEY,
+    invoice TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    paid_at INTEGER
+);
