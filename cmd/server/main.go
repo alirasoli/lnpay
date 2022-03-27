@@ -4,6 +4,7 @@ import (
 	"context"
 	"lnpay/internal/config"
 	"lnpay/internal/data/sqlite"
+	"lnpay/internal/service/exchange"
 	"lnpay/internal/service/payment"
 	"lnpay/internal/transport/http/fiber"
 	"log"
@@ -26,6 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	exchangeService := exchange.New()
 	paymentService := payment.New(&cfg.Payment, sqliteDB)
 
 	var wg sync.WaitGroup
@@ -39,7 +41,7 @@ func main() {
 		}
 	}()
 
-	f := fiber.New(paymentService)
+	f := fiber.New(paymentService, exchangeService)
 	if err := f.Serve(ctx, ":"+cfg.Server.Http.Port); err != nil {
 		cancel()
 		log.Fatal(err)

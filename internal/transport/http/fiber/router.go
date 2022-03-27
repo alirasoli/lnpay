@@ -9,4 +9,6 @@ func (s *server) setupRouter() {
 	})
 
 	s.app.Post("/pay", s.handler.pay)
+
+	s.app.Post("/exchange", s.handler.getPriceInSats)
 }

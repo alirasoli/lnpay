@@ -14,14 +14,16 @@ type server struct {
 }
 
 type handler struct {
-	paymentService service.Payment
+	exchangeService service.Exchange
+	paymentService  service.Payment
 }
 
-func New(paymentService service.Payment) http.HttpServer {
+func New(paymentService service.Payment, exchangeService service.Exchange) http.HttpServer {
 	return &server{
 		app: fiber.New(),
 		handler: &handler{
-			paymentService: paymentService,
+			exchangeService: exchangeService,
+			paymentService:  paymentService,
 		},
 	}
 }
