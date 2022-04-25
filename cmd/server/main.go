@@ -6,6 +6,7 @@ import (
 	"lnpay/internal/data/sqlite"
 	"lnpay/internal/service/exchange"
 	"lnpay/internal/service/payment"
+	"lnpay/internal/transport/grpc"
 	"lnpay/internal/transport/http/fiber"
 	"log"
 	"os/signal"
@@ -41,9 +42,18 @@ func main() {
 		}
 	}()
 
-	f := fiber.New(paymentService, exchangeService)
-	if err := f.Serve(ctx, ":"+cfg.Server.Http.Port); err != nil {
-		cancel()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		f := fiber.New(paymentService, exchangeService)
+		if err := f.Serve(ctx, ":"+cfg.Server.Http.Port); err != nil {
+			cancel()
+			log.Fatal(err)
+		}
+	}()
+
+	grpcServer := grpc.New()
+	if err := grpcServer.Serve(ctx); err != nil {
 		log.Fatal(err)
 	}
 

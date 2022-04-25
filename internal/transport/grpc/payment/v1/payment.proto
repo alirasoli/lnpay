@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "lnpay/internal/transport/payment/v1";
+
+package payment.v1;
+
+service PaymentService {
+    rpc Pay (PaymentRequest) returns (PaymentResponse) {}
+}
+
+message PaymentRequest {
+    int64 amount = 1;
+    string description = 2;
+    string webhook = 3;
+}
+
+message PaymentResponse {
+    string invoice = 1;
+    string hash = 2;
+}
