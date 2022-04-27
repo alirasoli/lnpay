@@ -2,9 +2,11 @@ package sqlite
 
 import (
 	"database/sql"
+	"embed"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"lnpay/internal/config"
@@ -14,6 +16,9 @@ import (
 type sqlite struct {
 	db *sql.DB
 }
+
+//go:embed migrations/*.sql
+var fs embed.FS
 
 func New(cfg config.SQLite) (data.Database, error) {
 	db, err := sql.Open("sqlite3", cfg.Path)
@@ -26,8 +31,13 @@ func New(cfg config.SQLite) (data.Database, error) {
 		return nil, errors.Wrap(err, "failed to create sqlite driver")
 	}
 
-	m, err := migrate.NewWithDatabaseInstance(
-		"file://internal/data/sqlite/migrations",
+	d, err := iofs.New(fs, "migrations")
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to embed migrations")
+	}
+
+	m, err := migrate.NewWithInstance(
+		"iofs", d,
 		"sqlite3", driver)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create migrations")
