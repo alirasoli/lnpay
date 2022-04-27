@@ -10,25 +10,24 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"lnpay/internal/config"
-	"lnpay/internal/data"
 )
 
-type sqlite struct {
-	db *sql.DB
+type Sqlite struct {
+	DB *sql.DB
 }
 
 //go:embed migrations/*.sql
 var fs embed.FS
 
-func New(cfg config.SQLite) (data.Database, error) {
+func New(cfg config.SQLite) (*Sqlite, error) {
 	db, err := sql.Open("sqlite3", cfg.Path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open sqlite database")
+		return nil, errors.Wrap(err, "failed to open Sqlite database")
 	}
 
 	driver, err := sqlite3.WithInstance(db, &sqlite3.Config{})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create sqlite driver")
+		return nil, errors.Wrap(err, "failed to create Sqlite driver")
 	}
 
 	d, err := iofs.New(fs, "migrations")
@@ -47,5 +46,5 @@ func New(cfg config.SQLite) (data.Database, error) {
 		return nil, errors.Wrap(err, "failed to migrate database")
 	}
 
-	return &sqlite{db: db}, nil
+	return &Sqlite{DB: db}, nil
 }

@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func (s *sqlite) CreatePayment(ctx context.Context, p *model.Payment) error {
-	_, err := s.db.ExecContext(ctx, `
+func (s *Sqlite) CreatePayment(ctx context.Context, p *model.Payment) error {
+	_, err := s.DB.ExecContext(ctx, `
 		INSERT INTO payment (
 		    hash,
 		    invoice,
@@ -18,8 +18,8 @@ func (s *sqlite) CreatePayment(ctx context.Context, p *model.Payment) error {
 	return err
 }
 
-func (s *sqlite) GetActivePayments(ctx context.Context, exp time.Duration) ([]*model.Payment, error) {
-	rows, err := s.db.QueryContext(ctx, `
+func (s *Sqlite) GetActivePayments(ctx context.Context, exp time.Duration) ([]*model.Payment, error) {
+	rows, err := s.DB.QueryContext(ctx, `
 		SELECT
 		    hash,
 		    invoice,
@@ -47,8 +47,8 @@ func (s *sqlite) GetActivePayments(ctx context.Context, exp time.Duration) ([]*m
 	return payments, nil
 }
 
-func (s *sqlite) SetPaymentPaid(ctx context.Context, hash string) error {
-	_, err := s.db.ExecContext(ctx, `
+func (s *Sqlite) SetPaymentPaid(ctx context.Context, hash string) error {
+	_, err := s.DB.ExecContext(ctx, `
 		UPDATE payment
 		SET paid_at = (strftime('%s', 'now'))
 		WHERE hash = ?
